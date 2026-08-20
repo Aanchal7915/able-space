@@ -76,7 +76,14 @@ function StatusGroup({ status, label, tasks }: { status: TaskStatus; label: stri
                   )}
                   {visibleFields.members && (
                     <td className="hidden px-3 py-2.5 md:table-cell">
-                      <AvatarStack users={task.assignee ? [task.assignee, ...task.members] : task.members} size="xs" />
+                      <AvatarStack
+                        users={
+                          task.assignee
+                            ? [task.assignee, ...task.members.filter((m) => m.id !== task.assignee?.id)]
+                            : task.members
+                        }
+                        size="xs"
+                      />
                     </td>
                   )}
                   {visibleFields.dueDate && (
