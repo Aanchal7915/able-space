@@ -80,10 +80,18 @@ export function TaskDetailDrawer() {
             {task?.parentTaskId && <span>Subtask</span>}
           </div>
           <div className="flex items-center gap-1">
-            <button onClick={remove} className="rounded-md p-1.5 text-muted-foreground hover:bg-surface-sunken hover:text-danger">
+            <button
+              onClick={remove}
+              className="rounded-md p-1.5 text-muted-foreground hover:bg-surface-sunken hover:text-danger"
+              aria-label="Delete task"
+            >
               <Trash2 className="size-4" />
             </button>
-            <button onClick={() => setActiveTaskId(null)} className="rounded-md p-1.5 text-muted-foreground hover:bg-surface-sunken hover:text-foreground">
+            <button
+              onClick={() => setActiveTaskId(null)}
+              className="rounded-md p-1.5 text-muted-foreground hover:bg-surface-sunken hover:text-foreground"
+              aria-label="Close task detail"
+            >
               <X className="size-4" />
             </button>
           </div>

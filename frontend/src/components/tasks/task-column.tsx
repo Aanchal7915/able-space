@@ -2,7 +2,7 @@
 
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { Plus, MoreHorizontal } from "lucide-react";
+import { Plus } from "lucide-react";
 import type { Task, TaskStatus } from "@/lib/types";
 import { TaskCard } from "./task-card";
 import { useUIStore } from "@/lib/ui-store";
@@ -39,11 +39,9 @@ export function TaskColumn({
           <button
             onClick={() => setAddTaskDialogOpen(true, status)}
             className="rounded p-1 text-muted-foreground hover:bg-surface-sunken hover:text-foreground"
+            title={`Add task to ${label}`}
           >
             <Plus className="size-3.5" />
-          </button>
-          <button className="rounded p-1 text-muted-foreground hover:bg-surface-sunken hover:text-foreground">
-            <MoreHorizontal className="size-3.5" />
           </button>
         </div>
       </div>

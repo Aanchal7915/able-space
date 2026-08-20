@@ -44,7 +44,8 @@ export function TaskCard({ task }: { task: Task }) {
         <TaskActionsMenu task={task}>
           <button
             onClick={(e) => e.stopPropagation()}
-            className="shrink-0 rounded p-0.5 text-muted-foreground opacity-0 hover:bg-surface-sunken group-hover:opacity-100"
+            className="shrink-0 rounded p-0.5 text-muted-foreground opacity-0 hover:bg-surface-sunken group-hover:opacity-100 group-focus-within:opacity-100 pointer-coarse:opacity-100"
+            aria-label={`Actions for ${task.title}`}
           >
             <MoreHorizontal className="size-3.5" />
           </button>

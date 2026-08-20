@@ -31,7 +31,10 @@ export function TaskLabelsRow({ task, onUpdate }: { task: Task; onUpdate: (patch
         <LabelPill key={l.id} name={l.name} />
       ))}
       <DropdownMenu>
-        <DropdownMenuTrigger className="flex size-5 items-center justify-center rounded border border-dashed border-border-strong text-muted-foreground hover:border-accent hover:text-accent">
+        <DropdownMenuTrigger
+          className="flex size-5 items-center justify-center rounded border border-dashed border-border-strong text-muted-foreground hover:border-accent hover:text-accent"
+          aria-label="Add label"
+        >
           <Plus className="size-3" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">

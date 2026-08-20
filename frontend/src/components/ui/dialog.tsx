@@ -25,7 +25,10 @@ export function DialogContent({
       >
         {children}
         {showClose && (
-          <DialogPrimitive.Close className="absolute right-4 top-4 rounded-md p-1 text-muted-foreground hover:bg-surface-sunken hover:text-foreground cursor-pointer">
+          <DialogPrimitive.Close
+            className="absolute right-4 top-4 rounded-md p-1 text-muted-foreground hover:bg-surface-sunken hover:text-foreground cursor-pointer"
+            aria-label="Close dialog"
+          >
             <X className="size-4" />
           </DialogPrimitive.Close>
         )}

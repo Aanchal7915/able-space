@@ -21,6 +21,7 @@ export function PageHeader({
         <button
           onClick={() => setMobileSidebarOpen(true)}
           className="rounded-md p-1.5 hover:bg-surface-sunken md:hidden"
+          aria-label="Open menu"
         >
           <Menu className="size-4.5" />
         </button>
@@ -28,6 +29,7 @@ export function PageHeader({
           onClick={toggleSidebarCollapsed}
           className="hidden rounded-md p-1.5 text-muted-foreground hover:bg-surface-sunken hover:text-foreground md:flex"
           title="Toggle sidebar"
+          aria-label="Toggle sidebar"
         >
           {sidebarCollapsed ? <PanelLeft className="size-4" /> : <PanelLeftClose className="size-4" />}
         </button>

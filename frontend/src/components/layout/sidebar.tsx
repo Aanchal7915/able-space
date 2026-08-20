@@ -76,6 +76,7 @@ export function Sidebar() {
         <button
           onClick={() => setMobileSidebarOpen(false)}
           className="rounded-md p-1.5 hover:bg-surface-sunken"
+          aria-label="Close menu"
         >
           <X className="size-4" />
         </button>
@@ -141,6 +142,7 @@ export function Sidebar() {
   return (
     <>
       <aside
+        aria-label="Primary navigation"
         className={cn(
           "hidden md:flex shrink-0 border-r border-border transition-[width] duration-150",
           sidebarCollapsed ? "w-[64px]" : "w-[240px]"
@@ -152,7 +154,10 @@ export function Sidebar() {
       {mobileSidebarOpen && (
         <div className="fixed inset-0 z-40 md:hidden">
           <div className="absolute inset-0 bg-overlay animate-fade-in" onClick={() => setMobileSidebarOpen(false)} />
-          <aside className="absolute left-0 top-0 h-full w-[260px] border-r border-border animate-slide-in-right shadow-2xl">
+          <aside
+            aria-label="Mobile navigation"
+            className="absolute left-0 top-0 h-full w-[260px] border-r border-border animate-slide-in-right shadow-2xl"
+          >
             {content}
           </aside>
         </div>

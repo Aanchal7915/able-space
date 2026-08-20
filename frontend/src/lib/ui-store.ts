@@ -5,6 +5,7 @@ import { create } from "zustand";
 export type ViewMode = "board" | "list";
 
 export type FieldKey = "priority" | "members" | "dueDate" | "labels" | "status" | "reporter";
+export type ProjectFieldKey = "priority" | "lead" | "dueDate" | "taskCount";
 
 interface UIState {
   mobileSidebarOpen: boolean;
@@ -15,6 +16,8 @@ interface UIState {
   setViewMode: (mode: ViewMode) => void;
   visibleFields: Record<FieldKey, boolean>;
   toggleField: (field: FieldKey) => void;
+  visibleProjectFields: Record<ProjectFieldKey, boolean>;
+  toggleProjectField: (field: ProjectFieldKey) => void;
   activeTaskId: string | null;
   setActiveTaskId: (id: string | null) => void;
   addTaskDialogOpen: boolean;
@@ -39,6 +42,16 @@ export const useUIStore = create<UIState>((set) => ({
   },
   toggleField: (field) =>
     set((s) => ({ visibleFields: { ...s.visibleFields, [field]: !s.visibleFields[field] } })),
+  visibleProjectFields: {
+    priority: true,
+    lead: true,
+    dueDate: true,
+    taskCount: true,
+  },
+  toggleProjectField: (field) =>
+    set((s) => ({
+      visibleProjectFields: { ...s.visibleProjectFields, [field]: !s.visibleProjectFields[field] },
+    })),
   activeTaskId: null,
   setActiveTaskId: (id) => set({ activeTaskId: id }),
   addTaskDialogOpen: false,

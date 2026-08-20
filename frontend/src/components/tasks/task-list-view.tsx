@@ -102,7 +102,10 @@ function StatusGroup({ status, label, tasks }: { status: TaskStatus; label: stri
                   )}
                   <td className="px-3 py-2.5 text-right" onClick={(e) => e.stopPropagation()}>
                     <TaskActionsMenu task={task}>
-                      <button className="rounded p-1 text-muted-foreground hover:bg-surface hover:text-foreground">
+                      <button
+                        className="rounded p-1 text-muted-foreground hover:bg-surface hover:text-foreground"
+                        aria-label={`Actions for ${task.title}`}
+                      >
                         <MoreHorizontal className="size-3.5" />
                       </button>
                     </TaskActionsMenu>

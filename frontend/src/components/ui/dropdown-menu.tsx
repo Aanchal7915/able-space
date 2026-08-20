@@ -74,10 +74,18 @@ export const DropdownMenuCheckboxItem = ({
   className,
   children,
   checked,
+  onSelect,
   ...props
 }: DropdownMenuPrimitive.DropdownMenuCheckboxItemProps) => (
   <DropdownMenuPrimitive.CheckboxItem
     checked={checked}
+    // Checkbox items represent a multi-select toggle (Fields, Filters) — the
+    // menu should stay open across multiple picks, unlike a regular Item
+    // that performs a single navigating/triggering action.
+    onSelect={(event) => {
+      event.preventDefault();
+      onSelect?.(event);
+    }}
     className={cn(
       "flex items-center gap-2 rounded-md px-2 py-1.5 text-[13px] outline-none cursor-pointer text-foreground hover:bg-surface-sunken data-[highlighted]:bg-surface-sunken",
       className

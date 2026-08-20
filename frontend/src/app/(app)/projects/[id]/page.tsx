@@ -1,10 +1,11 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useMemo, useState } from "react";
 import Link from "next/link";
 import { ChevronRight, Plus, Search } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { FieldsMenu } from "@/components/tasks/fields-menu";
+import { TaskFiltersMenu, applyTaskFilters, EMPTY_TASK_FILTERS, type TaskFilters } from "@/components/tasks/task-filters-menu";
 import { ViewToggle } from "@/components/tasks/view-toggle";
 import { TaskBoard } from "@/components/tasks/task-board";
 import { TaskListView } from "@/components/tasks/task-list-view";
@@ -20,7 +21,9 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
   const { project } = useProject(id);
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
+  const [filters, setFilters] = useState<TaskFilters>(EMPTY_TASK_FILTERS);
   const { tasks, mutate, isLoading } = useTasks({ projectId: id, search: search || undefined });
+  const filteredTasks = useMemo(() => applyTaskFilters(tasks, filters), [tasks, filters]);
   const viewMode = useUIStore((s) => s.viewMode);
   const setAddTaskDialogOpen = useUIStore((s) => s.setAddTaskDialogOpen);
 
@@ -47,11 +50,16 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
             className="h-8 w-[180px] sm:w-[220px]"
           />
         ) : (
-          <button onClick={() => setSearchOpen(true)} className="rounded-md p-1.5 text-muted-foreground hover:bg-surface-sunken hover:text-foreground">
+          <button
+            onClick={() => setSearchOpen(true)}
+            className="rounded-md p-1.5 text-muted-foreground hover:bg-surface-sunken hover:text-foreground"
+            aria-label="Search tasks"
+          >
             <Search className="size-4" />
           </button>
         )}
         <FieldsMenu />
+        <TaskFiltersMenu filters={filters} onChange={setFilters} />
         <ViewToggle />
         <Button size="sm" onClick={() => setAddTaskDialogOpen(true, "todo")}>
           <Plus className="size-3.5" />
@@ -69,10 +77,17 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
             Add Task
           </Button>
         </div>
+      ) : filteredTasks.length === 0 ? (
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
+          <p className="text-sm font-medium text-foreground">No tasks match your filters</p>
+          <Button size="sm" variant="outline" onClick={() => setFilters(EMPTY_TASK_FILTERS)}>
+            Clear filters
+          </Button>
+        </div>
       ) : viewMode === "board" ? (
-        <TaskBoard tasks={tasks} mutate={mutate} />
+        <TaskBoard tasks={filteredTasks} mutate={mutate} />
       ) : (
-        <TaskListView tasks={tasks} />
+        <TaskListView tasks={filteredTasks} />
       )}
 
       <AddTaskDialog projectId={id} />
