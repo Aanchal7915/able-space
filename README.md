@@ -87,7 +87,12 @@ explaining Google login isn't configured — the app boots fine either way.
 - ✅ **Tasks** — kanban board (drag-and-drop between/within columns) and a
   grouped list view, toggle between them, matching the Fields-menu-driven
   column visibility (Priority/Members/Due Date/Labels/Status/Reporter) seen
-  in the Figma comments
+  in the Figma comments, plus a Filter menu (by priority/labels) matching the
+  filter icon visible in the Figma toolbar next to Fields
+- ✅ **Projects toolbar parity** — the Figma shows the same Fields + Filter
+  controls on the Projects screen as on Tasks; an earlier pass only wired
+  these up for Tasks, caught and fixed during a full re-verification pass
+  against the Figma screenshots (see "Bugs found and fixed" below)
 - ✅ **Task detail** — title/description editing, Properties, Labels,
   Resources, Subtasks table with inline add, Comments thread — laid out as a
   right-hand slide-over exactly like the Figma detail screens, with a
@@ -106,6 +111,49 @@ explaining Google login isn't configured — the app boots fine either way.
   scrolls horizontally, list view collapses columns by breakpoint, task
   detail becomes full-screen below `lg`. See `docs/screenshots/08-*` and
   `09-*` for mobile captures.
+
+## Bugs found and fixed during QA
+
+After the initial build, every screen was re-verified against the Figma
+screenshots and driven end-to-end with Playwright (desktop/tablet/mobile,
+light/dark, all six accent colors, every CRUD path, drag-and-drop, filters).
+That pass caught and fixed several real issues rather than just cosmetic
+ones — listed here instead of quietly folded into the diff, since knowing
+what was actually broken is more useful than a bare "it works":
+
+- **Guest logins were permanently polluting every assignee picker** (the
+  most serious one). Seed "team member" users were mistakenly flagged
+  `isGuest: true`; once `GET /api/users` was fixed to exclude guests (so a
+  "Continue as Guest" click doesn't itself become a forever-visible
+  assignee), the same flag on the seed data hid the real team roster too.
+  Fixed at the source (`isGuest: false` on seed users) with a regression
+  test (`test/app.e2e-spec.ts`) asserting guests never appear in the picker.
+- **Multi-select dropdowns closed after a single click** — Fields, Filter,
+  and the task detail's Members picker all use checkbox items, but Radix
+  closes a dropdown on any select by default. Toggling a second field/label/
+  member required reopening the menu each time. Fixed once at the shared
+  `DropdownMenuCheckboxItem` component.
+- **The Filter menu closed itself when hovering toward its own submenu** —
+  a genuine Radix positioning bug: when a submenu is forced to flip open on
+  its left side (which happens when the trigger sits near the right edge of
+  the toolbar, as Filter does), Radix's hover "safe area" tracking breaks
+  and the submenu unmounts before a click can land. Confirmed with a
+  MutationObserver + forced clicks, then fixed by flattening Filter into a
+  single-level list instead of a nested submenu (also simpler to use).
+- **The kanban column's `⋯` button did nothing** — a leftover from the
+  Figma layout with no wired action; removed rather than left as a dead
+  click target.
+- **The task card's `⋯` action menu was invisible on touch devices** — it
+  only appeared on `:hover`, which doesn't exist on mobile/tablet. Fixed
+  with a `pointer-coarse:` variant so it's always visible on touch, plus
+  `focus-within` for keyboard users.
+- **~10 icon-only buttons had no accessible name** (search toggle, close,
+  delete, sidebar hamburger, `⋯` menus, dialog close) — added `aria-label`s
+  throughout, plus distinct landmark labels for the desktop vs. mobile
+  sidebar (previously both were unlabeled `<aside>` regions with identical
+  content, which is confusing for screen reader users).
+- **Projects page was missing Fields/Filter/Search** that the Figma clearly
+  shows in its toolbar — added, matching the Tasks page pattern.
 
 ## Design fidelity notes / intentional deviations
 
@@ -138,6 +186,17 @@ to keep the scope shippable as a fresher assessment, not an oversight:
 5. A few labels/members/dates that were cut off or unreadable in the
    low-resolution Figma screenshots (e.g. exact seed due dates) were filled
    in with reasonable placeholder values rather than guessed pixel-for-pixel.
+6. **List/Board toggle placement** — the Figma nests the List/Board switch
+   inside the Fields dropdown; this build surfaces it as its own
+   always-visible segmented control next to Fields instead, so switching
+   views doesn't require opening a menu first. Same capability, one click
+   fewer, everything else about that Fields menu matches.
+7. **Assignable roster excludes guest sessions by design** — "members" you
+   can assign a task/project to are the fixed seeded team (Admin, Designer,
+   Dev Team, Product, QA Team, Security, Ankit Dutta), not every visitor who
+   has clicked "Continue as Guest". A guest can fully use the app (create,
+   edit, comment) but isn't themselves assignable, the same way a demo
+   visitor isn't added to a real team roster. See "Bugs found and fixed".
 
 ## Deployment
 
