@@ -4,6 +4,20 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
 
+interface GuestResponseBody {
+  accessToken: string;
+  user: { isGuest: boolean; [key: string]: unknown };
+}
+
+async function createGuest(
+  app: INestApplication<App>,
+): Promise<GuestResponseBody> {
+  const res = await request(app.getHttpServer())
+    .post('/api/auth/guest')
+    .expect(201);
+  return res.body as GuestResponseBody;
+}
+
 describe('Task manager API (e2e)', () => {
   let app: INestApplication<App>;
 
@@ -15,7 +29,11 @@ describe('Task manager API (e2e)', () => {
     app = moduleFixture.createNestApplication();
     app.setGlobalPrefix('api');
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true }),
+      new ValidationPipe({
+        whitelist: true,
+        transform: true,
+        forbidNonWhitelisted: true,
+      }),
     );
     await app.init();
   });
@@ -25,12 +43,12 @@ describe('Task manager API (e2e)', () => {
   });
 
   it('POST /api/auth/guest issues a token and never leaks passwordHash/googleId', async () => {
-    const res = await request(app.getHttpServer()).post('/api/auth/guest').expect(201);
+    const body = await createGuest(app);
 
-    expect(res.body.accessToken).toEqual(expect.any(String));
-    expect(res.body.user.isGuest).toBe(true);
-    expect(res.body.user).not.toHaveProperty('passwordHash');
-    expect(res.body.user).not.toHaveProperty('googleId');
+    expect(body.accessToken).toEqual(expect.any(String));
+    expect(body.user.isGuest).toBe(true);
+    expect(body.user).not.toHaveProperty('passwordHash');
+    expect(body.user).not.toHaveProperty('googleId');
   });
 
   it('rejects unauthenticated requests to protected routes', () => {
@@ -38,9 +56,7 @@ describe('Task manager API (e2e)', () => {
   });
 
   it('lets a guest fetch tasks/labels/projects with their token', async () => {
-    const {
-      body: { accessToken },
-    } = await request(app.getHttpServer()).post('/api/auth/guest').expect(201);
+    const { accessToken } = await createGuest(app);
 
     await request(app.getHttpServer())
       .get('/api/tasks')
@@ -58,10 +74,20 @@ describe('Task manager API (e2e)', () => {
       .expect(200);
   });
 
+  it('excludes guest accounts from the assignable users list', async () => {
+    const { accessToken } = await createGuest(app);
+
+    const res = await request(app.getHttpServer())
+      .get('/api/users')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+
+    const users = res.body as { fullName: string }[];
+    expect(users.some((u) => u.fullName.startsWith('Guest '))).toBe(false);
+  });
+
   it('rejects a task with an unknown field (forbidNonWhitelisted)', async () => {
-    const {
-      body: { accessToken },
-    } = await request(app.getHttpServer()).post('/api/auth/guest').expect(201);
+    const { accessToken } = await createGuest(app);
 
     return request(app.getHttpServer())
       .post('/api/tasks')
@@ -71,9 +97,7 @@ describe('Task manager API (e2e)', () => {
   });
 
   it('404s on a task id that does not exist', async () => {
-    const {
-      body: { accessToken },
-    } = await request(app.getHttpServer()).post('/api/auth/guest').expect(201);
+    const { accessToken } = await createGuest(app);
 
     return request(app.getHttpServer())
       .get('/api/tasks/does-not-exist')

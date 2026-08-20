@@ -9,6 +9,7 @@ import { AvatarStack, UserAvatar } from "@/components/ui/avatar";
 import { formatDate } from "@/lib/utils";
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
@@ -163,11 +164,14 @@ function MembersEditor({ task, onUpdate }: { task: Task; onUpdate: (patch: Recor
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         {users.map((u) => (
-          <DropdownMenuItem key={u.id} onClick={() => toggle(u.id)}>
+          <DropdownMenuCheckboxItem
+            key={u.id}
+            checked={memberIds.includes(u.id)}
+            onCheckedChange={() => toggle(u.id)}
+          >
             <UserAvatar user={u} size="xs" />
             {u.fullName}
-            {memberIds.includes(u.id) && <span className="ml-auto size-1.5 rounded-full bg-accent" />}
-          </DropdownMenuItem>
+          </DropdownMenuCheckboxItem>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>

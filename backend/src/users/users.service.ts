@@ -17,8 +17,16 @@ const PUBLIC_USER_SELECT = {
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /**
+   * Used to populate assignee/member/lead pickers. Deliberately excludes
+   * guest accounts: every "Continue as Guest" click creates a new User row,
+   * and without this filter each guest session would permanently appear as
+   * an assignable "team member" to everyone else, forever, growing without
+   * bound. Only the seeded/registered (non-guest) roster is assignable.
+   */
   findAll() {
     return this.prisma.user.findMany({
+      where: { isGuest: false },
       select: PUBLIC_USER_SELECT,
       orderBy: { fullName: 'asc' },
     });

@@ -12,8 +12,12 @@ async function main() {
   console.log('Seeding database...');
 
   // -------------------------------------------------------------------
-  // Users (seed "team members" — no login accounts, isGuest just marks
-  // them as not real authenticated users)
+  // Users (seed "team members" — fixed roster people can be assigned to,
+  // NOT ad-hoc login accounts. isGuest must be false here: GET /api/users
+  // (which powers every assignee/member/lead picker) filters out
+  // isGuest:true users specifically so that real "Continue as Guest"
+  // sessions don't permanently clutter those pickers — these seeded rows
+  // need to stay on the other side of that filter to remain assignable.
   // -------------------------------------------------------------------
   const userSeeds = [
     { fullName: 'Admin', avatarColor: '#F59E0B', title: 'Workspace Admin' },
@@ -28,7 +32,7 @@ async function main() {
   const users: Record<string, Awaited<ReturnType<typeof prisma.user.create>>> = {};
   for (const u of userSeeds) {
     users[u.fullName] = await prisma.user.create({
-      data: { ...u, isGuest: true },
+      data: { ...u, isGuest: false },
     });
   }
   const admin = users['Admin'];
