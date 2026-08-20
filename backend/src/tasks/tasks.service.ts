@@ -52,13 +52,20 @@ const DETAIL_INCLUDE = {
 // Flattens the `members: TaskMember[]` / `labels: TaskLabel[]` join-table
 // shapes Prisma returns into plain `members: User[]` / `labels: Label[]`
 // arrays, and (when the `_count` relation-count was included) exposes it as
-// a flat `subtaskCount` number. Accepts any task-like include shape.
-function flattenTask(task: Record<string, any>) {
+// a flat `subtaskCount` number. Generic so it type-checks against both
+// LIST_INCLUDE and DETAIL_INCLUDE payload shapes without resorting to `any`.
+function flattenTask<
+  T extends {
+    members?: { user: unknown }[];
+    labels?: { label: unknown }[];
+    _count?: { subtasks: number };
+  },
+>(task: T) {
   const { members, labels, _count, ...rest } = task;
   return {
     ...rest,
-    ...(members ? { members: members.map((m: any) => m.user) } : {}),
-    ...(labels ? { labels: labels.map((l: any) => l.label) } : {}),
+    ...(members ? { members: members.map((m) => m.user) } : {}),
+    ...(labels ? { labels: labels.map((l) => l.label) } : {}),
     ...(_count ? { subtaskCount: _count.subtasks } : {}),
   };
 }
@@ -98,7 +105,10 @@ export class TasksService {
   }
 
   async findOne(id: string) {
-    const task = await this.prisma.task.findUnique({ where: { id }, include: DETAIL_INCLUDE });
+    const task = await this.prisma.task.findUnique({
+      where: { id },
+      include: DETAIL_INCLUDE,
+    });
     if (!task) {
       throw new NotFoundException(`Task ${id} not found`);
     }
@@ -127,8 +137,12 @@ export class TasksService {
         assigneeId: dto.assigneeId,
         reporterId: dto.reporterId ?? ownerId,
         ownerId,
-        members: dto.memberIds ? { create: dto.memberIds.map((userId) => ({ userId })) } : undefined,
-        labels: dto.labelIds ? { create: dto.labelIds.map((labelId) => ({ labelId })) } : undefined,
+        members: dto.memberIds
+          ? { create: dto.memberIds.map((userId) => ({ userId })) }
+          : undefined,
+        labels: dto.labelIds
+          ? { create: dto.labelIds.map((labelId) => ({ labelId })) }
+          : undefined,
       },
       include: LIST_INCLUDE,
     });
@@ -152,14 +166,23 @@ export class TasksService {
         description: dto.description,
         status: dto.status,
         priority: dto.priority,
-        dueDate: dto.dueDate === undefined ? undefined : dto.dueDate ? new Date(dto.dueDate) : null,
+        dueDate:
+          dto.dueDate === undefined
+            ? undefined
+            : dto.dueDate
+              ? new Date(dto.dueDate)
+              : null,
         order: dto.order,
         projectId: dto.projectId,
         parentTaskId: dto.parentTaskId,
         assigneeId: dto.assigneeId,
         reporterId: dto.reporterId,
-        members: dto.memberIds ? { create: dto.memberIds.map((userId) => ({ userId })) } : undefined,
-        labels: dto.labelIds ? { create: dto.labelIds.map((labelId) => ({ labelId })) } : undefined,
+        members: dto.memberIds
+          ? { create: dto.memberIds.map((userId) => ({ userId })) }
+          : undefined,
+        labels: dto.labelIds
+          ? { create: dto.labelIds.map((labelId) => ({ labelId })) }
+          : undefined,
       },
       include: LIST_INCLUDE,
     });
@@ -171,7 +194,11 @@ export class TasksService {
     await this.prisma.task.delete({ where: { id } });
   }
 
-  async createSubtask(parentTaskId: string, dto: CreateSubtaskDto, ownerId: string) {
+  async createSubtask(
+    parentTaskId: string,
+    dto: CreateSubtaskDto,
+    ownerId: string,
+  ) {
     const parent = await this.assertExists(parentTaskId);
     const subtask = await this.prisma.task.create({
       data: {

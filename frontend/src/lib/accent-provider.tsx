@@ -16,7 +16,10 @@ export function AccentProvider({ children }: { children: React.ReactNode }) {
   const [accent, setAccentState] = useState<ColorMode>("blue");
 
   useEffect(() => {
+    // Reading localStorage is only possible client-side post-mount (it isn't
+    // available during SSR), so this initial sync has to happen in an effect.
     const stored = window.localStorage.getItem(STORAGE_KEY) as ColorMode | null;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (stored) setAccentState(stored);
   }, []);
 

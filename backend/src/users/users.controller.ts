@@ -1,4 +1,13 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Patch, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Patch,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import type { User } from '@prisma/client';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -25,7 +34,10 @@ export class UsersController {
   }
 
   @Patch('me/preferences')
-  updatePreferences(@CurrentUser() user: User, @Body() dto: UpdatePreferencesDto) {
+  updatePreferences(
+    @CurrentUser() user: User,
+    @Body() dto: UpdatePreferencesDto,
+  ) {
     return this.usersService.updatePreferences(user.id, dto);
   }
 

@@ -21,11 +21,16 @@ export function TaskDetailDrawer() {
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Re-seed the editable draft whenever a different task is opened (keyed
+    // on task?.id, not the whole object, so in-flight edits to the current
+    // task aren't clobbered by its own refetch).
     if (task) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTitle(task.title);
       setDescription(task.description ?? "");
     }
-  }, [task?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [task?.id]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

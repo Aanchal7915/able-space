@@ -66,7 +66,12 @@ export class ProjectsService {
       data: {
         name: dto.name,
         priority: dto.priority,
-        dueDate: dto.dueDate === undefined ? undefined : dto.dueDate ? new Date(dto.dueDate) : null,
+        dueDate:
+          dto.dueDate === undefined
+            ? undefined
+            : dto.dueDate
+              ? new Date(dto.dueDate)
+              : null,
         leadId: dto.leadId,
       },
       include: { lead: LEAD_SELECT },

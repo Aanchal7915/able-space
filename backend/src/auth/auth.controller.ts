@@ -1,4 +1,13 @@
-import { Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
@@ -38,7 +47,9 @@ export class AuthController {
     const profile = req.user as GoogleProfile;
     const user = await this.authService.upsertGoogleUser(profile);
     const accessToken = this.authService.signToken(user);
-    const frontendOrigin = (this.config.get<string>('FRONTEND_ORIGIN') ?? '').split(',')[0]?.trim();
+    const frontendOrigin = (this.config.get<string>('FRONTEND_ORIGIN') ?? '')
+      .split(',')[0]
+      ?.trim();
     res.redirect(`${frontendOrigin}/auth/callback?token=${accessToken}`);
   }
 

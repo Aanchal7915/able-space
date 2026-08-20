@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { api, clearToken, getToken, setToken, API_URL } from "./api";
 import type { ColorMode, Theme, User } from "./types";
 
@@ -17,6 +18,7 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -38,6 +40,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    // One-time session check against whatever token localStorage has on
+    // mount; there's no external-state subscription to model here, just an
+    // initial fetch, so the setState-in-effect lint rule doesn't apply.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refresh();
   }, [refresh]);
 
@@ -50,14 +56,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const loginWithGoogle = useCallback(() => {
+    // Full navigation to the backend's own origin to kick off the OAuth
+    // redirect dance — this isn't an internal Next.js route, so router.push
+    // doesn't apply here.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
     window.location.href = `${API_URL}/api/auth/google`;
   }, []);
 
   const logout = useCallback(() => {
     clearToken();
     setUser(null);
-    window.location.href = "/login";
-  }, []);
+    router.push("/login");
+  }, [router]);
 
   const updateUser = useCallback((partial: Partial<User>) => {
     setUser((prev) => (prev ? { ...prev, ...partial } : prev));

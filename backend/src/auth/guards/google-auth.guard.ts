@@ -1,4 +1,8 @@
-import { ExecutionContext, Injectable, NotImplementedException } from '@nestjs/common';
+import {
+  ExecutionContext,
+  Injectable,
+  NotImplementedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -17,14 +21,16 @@ export class GoogleAuthGuard extends AuthGuard('google') {
   private isConfigured(): boolean {
     return Boolean(
       this.config.get<string>('GOOGLE_CLIENT_ID') &&
-        this.config.get<string>('GOOGLE_CLIENT_SECRET') &&
-        this.config.get<string>('GOOGLE_CALLBACK_URL'),
+      this.config.get<string>('GOOGLE_CLIENT_SECRET') &&
+      this.config.get<string>('GOOGLE_CALLBACK_URL'),
     );
   }
 
   canActivate(context: ExecutionContext) {
     if (!this.isConfigured()) {
-      throw new NotImplementedException('Google login is not configured on this server.');
+      throw new NotImplementedException(
+        'Google login is not configured on this server.',
+      );
     }
     return super.canActivate(context) as boolean | Promise<boolean>;
   }

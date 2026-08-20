@@ -17,7 +17,9 @@ async function bootstrap() {
     }),
   );
 
-  const frontendOrigins = (process.env.FRONTEND_ORIGIN ?? 'http://localhost:3000')
+  const frontendOrigins = (
+    process.env.FRONTEND_ORIGIN ?? 'http://localhost:3000'
+  )
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean);
@@ -38,7 +40,7 @@ async function bootstrap() {
 
   const port = process.env.PORT ?? 3001;
   await app.listen(port);
-  // eslint-disable-next-line no-console
+
   console.log(`Server listening on http://localhost:${port}/api`);
 }
-bootstrap();
+void bootstrap();

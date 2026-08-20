@@ -14,7 +14,11 @@ import { GoogleStrategy } from './strategies/google.strategy';
 // vars are actually set — otherwise GoogleAuthGuard short-circuits with a
 // 501 before passport ever tries to use the (unregistered) "google" strategy.
 const googleProviders: Provider[] = [];
-if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_CALLBACK_URL) {
+if (
+  process.env.GOOGLE_CLIENT_ID &&
+  process.env.GOOGLE_CLIENT_SECRET &&
+  process.env.GOOGLE_CALLBACK_URL
+) {
   googleProviders.push(GoogleStrategy);
 }
 
@@ -28,7 +32,8 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.
       useFactory: (config: ConfigService) => ({
         secret: config.get<string>('JWT_SECRET'),
         signOptions: {
-          expiresIn: (config.get<string>('JWT_EXPIRES_IN') ?? '7d') as unknown as number,
+          expiresIn: (config.get<string>('JWT_EXPIRES_IN') ??
+            '7d') as unknown as number,
         },
       }),
     }),

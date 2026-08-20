@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Calendar } from "lucide-react";
 import type { Task, Priority, TaskStatus } from "@/lib/types";
 import { PRIORITY_META, STATUS_COLUMNS } from "@/lib/types";

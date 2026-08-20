@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import type { User } from '@prisma/client';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -45,7 +57,11 @@ export class TasksController {
   }
 
   @Post(':id/subtasks')
-  createSubtask(@Param('id') id: string, @Body() dto: CreateSubtaskDto, @CurrentUser() user: User) {
+  createSubtask(
+    @Param('id') id: string,
+    @Body() dto: CreateSubtaskDto,
+    @CurrentUser() user: User,
+  ) {
     return this.tasksService.createSubtask(id, dto, user.id);
   }
 
@@ -55,7 +71,11 @@ export class TasksController {
   }
 
   @Post(':id/comments')
-  addComment(@Param('id') id: string, @Body() dto: CreateCommentDto, @CurrentUser() user: User) {
+  addComment(
+    @Param('id') id: string,
+    @Body() dto: CreateCommentDto,
+    @CurrentUser() user: User,
+  ) {
     return this.tasksService.addComment(id, dto, user.id);
   }
 

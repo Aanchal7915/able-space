@@ -26,13 +26,19 @@ export class UsersService {
 
   async updateMe(userId: string, dto: UpdateUserDto) {
     await this.assertExists(userId);
-    const user = await this.prisma.user.update({ where: { id: userId }, data: dto });
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: dto,
+    });
     return toPublicUser(user);
   }
 
   async updatePreferences(userId: string, dto: UpdatePreferencesDto) {
     await this.assertExists(userId);
-    const user = await this.prisma.user.update({ where: { id: userId }, data: dto });
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: dto,
+    });
     return toPublicUser(user);
   }
 
