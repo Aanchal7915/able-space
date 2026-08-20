@@ -51,6 +51,17 @@ export default function LoginPage() {
     }
   };
 
+  const handleGoogle = async () => {
+    setSubmitting("google");
+    setError(null);
+    try {
+      await loginWithGoogle();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Couldn't sign in with Google.");
+      setSubmitting(null);
+    }
+  };
+
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-surface-sunken px-4">
       <div className="mb-8 flex items-center gap-2 text-foreground">
@@ -82,14 +93,11 @@ export default function LoginPage() {
             variant="outline"
             size="lg"
             className="w-full"
-            onClick={() => {
-              setSubmitting("google");
-              loginWithGoogle();
-            }}
+            onClick={handleGoogle}
             disabled={submitting !== null}
           >
             <GoogleIcon />
-            Login with Google
+            {submitting === "google" ? "Redirecting…" : "Login with Google"}
           </Button>
         </div>
 

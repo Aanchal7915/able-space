@@ -9,7 +9,7 @@ interface AuthContextValue {
   user: User | null;
   loading: boolean;
   loginAsGuest: () => Promise<void>;
-  loginWithGoogle: () => void;
+  loginWithGoogle: () => Promise<void>;
   logout: () => void;
   refresh: () => Promise<void>;
   updateUser: (partial: Partial<User>) => void;
@@ -55,12 +55,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(newUser);
   }, []);
 
-  const loginWithGoogle = useCallback(() => {
-    // Full navigation to the backend's own origin to kick off the OAuth
-    // redirect dance — this isn't an internal Next.js route, so router.push
-    // doesn't apply here.
-    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-    window.location.href = `${API_URL}/api/auth/google`;
+  const loginWithGoogle = useCallback(async () => {
+    // Probe first (without following the redirect) so an unconfigured
+    // server surfaces as a toast instead of a raw JSON 501 page — the real
+    // navigation only happens once we know Google would actually redirect.
+    const probeUrl = `${API_URL}/api/auth/google`;
+    const res = await fetch(probeUrl, { redirect: "manual" });
+    if (res.type === "opaqueredirect" || (res.status >= 300 && res.status < 400)) {
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      window.location.href = probeUrl;
+      return;
+    }
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.message || "Google login is not available right now.");
   }, []);
 
   const logout = useCallback(() => {
