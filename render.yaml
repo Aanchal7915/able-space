@@ -25,7 +25,9 @@ services:
         sync: false
       - key: GOOGLE_CALLBACK_URL
         sync: false
-    disk:
-      name: sqlite-data
-      mountPath: /app/prisma
-      sizeGB: 1
+    # No persistent disk here: Render's free tier doesn't support them.
+    # SQLite still works fine on the container's own ephemeral filesystem
+    # while it's running (survives idle spin-down/wake-up, which reuses the
+    # same container) — it only resets on an actual redeploy, at which point
+    # prisma/seed-if-empty.js re-seeds fresh demo data automatically. Add a
+    # `disk:` block back (see git history) if you upgrade off the free plan.

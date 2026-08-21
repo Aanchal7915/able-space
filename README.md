@@ -205,9 +205,12 @@ it — that step needs the assessment candidate's own GitHub/Vercel/Render
 accounts, which weren't available in this environment. Recommended path:
 
 1. **Backend → Render** (or Fly/Railway): `render.yaml` at the repo root is a
-   ready-to-use Blueprint (`Dockerfile` in `backend/`, persistent disk for
-   the SQLite file). Set `FRONTEND_ORIGIN` to your deployed frontend URL
-   after step 2.
+   ready-to-use Blueprint (`Dockerfile` in `backend/`) that deploys on
+   Render's free plan. Free tier doesn't support persistent disks, so SQLite
+   lives on the container's own ephemeral filesystem — fine while it's
+   running, and it auto-reseeds fresh demo data on redeploy (see comment in
+   `render.yaml`). Set `FRONTEND_ORIGIN` to your deployed frontend URL after
+   step 2.
 2. **Frontend → Vercel**: import the repo, set the project root to
    `frontend/`, add `NEXT_PUBLIC_API_URL=<your backend URL>` as an
    environment variable, deploy.
