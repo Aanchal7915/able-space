@@ -240,6 +240,18 @@ export class TasksService {
     });
   }
 
+  async removeResource(taskId: string, resourceId: string) {
+    const resource = await this.prisma.resource.findUnique({
+      where: { id: resourceId },
+    });
+    if (!resource || resource.taskId !== taskId) {
+      throw new NotFoundException(
+        `Resource ${resourceId} not found on task ${taskId}`,
+      );
+    }
+    await this.prisma.resource.delete({ where: { id: resourceId } });
+  }
+
   private async assertExists(id: string) {
     const task = await this.prisma.task.findUnique({ where: { id } });
     if (!task) {

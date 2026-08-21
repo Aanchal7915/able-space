@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Link as LinkIcon } from "lucide-react";
+import { Plus, Link as LinkIcon, X } from "lucide-react";
 import { toast } from "sonner";
 import type { Task } from "@/lib/types";
 import { useLabels } from "@/hooks/use-data";
@@ -79,16 +79,27 @@ export function TaskResourcesRow({ task, onChanged }: { task: Task; onChanged: (
       <span className="text-[13px] text-muted-foreground">Resources</span>
       <div className="mt-1.5 flex flex-col gap-1.5">
         {resources.map((r) => (
-          <a
-            key={r.id}
-            href={r.url}
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center gap-1.5 text-[13px] text-accent hover:underline"
-          >
-            <LinkIcon className="size-3.5" />
-            {r.label}
-          </a>
+          <div key={r.id} className="group flex items-center gap-1.5">
+            <a
+              href={r.url}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1.5 text-[13px] text-accent hover:underline"
+            >
+              <LinkIcon className="size-3.5" />
+              {r.label}
+            </a>
+            <button
+              onClick={async () => {
+                await api.delete(`/tasks/${task.id}/resources/${r.id}`);
+                onChanged();
+              }}
+              className="opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 text-muted-foreground hover:text-danger"
+              aria-label={`Remove ${r.label}`}
+            >
+              <X className="size-3.5" />
+            </button>
+          </div>
         ))}
         {adding ? (
           <form onSubmit={submit} className="flex items-center gap-2">

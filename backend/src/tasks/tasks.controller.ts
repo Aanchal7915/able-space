@@ -83,4 +83,13 @@ export class TasksController {
   addResource(@Param('id') id: string, @Body() dto: CreateResourceDto) {
     return this.tasksService.addResource(id, dto);
   }
+
+  @Delete(':id/resources/:resourceId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async removeResource(
+    @Param('id') id: string,
+    @Param('resourceId') resourceId: string,
+  ) {
+    await this.tasksService.removeResource(id, resourceId);
+  }
 }
